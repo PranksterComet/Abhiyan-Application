@@ -19,7 +19,7 @@ import cv2
 import numpy as np
    
 # Create a VideoCapture object and read from input file
-cap = cv2.VideoCapture(r'C:\Users\skand\Downloads\bolt_test_pothole.mp4')
+cap = cv2.VideoCapture(r'C:\Users\skand\Downloads\bolt_test_pothole.mp4') #REPLACE FILE ADDRESS HERE
 
 size = (594, 1280)
 
