@@ -1,0 +1,118 @@
+'''
+NOTE: Currently not able to save the output video as a separate file so to see the output, replace the file address in videocapture with that in your computer
+Uses simpleblob detection to identify elliptical objects.
+Previously used contours, but unable to detect only the potholes using that approach
+Faults: 
+Identifying the logo and white stripes of the cones which are unnecessary detections.
+Logo problem solvable by masking the logo by drawing a rectangle around it in the input frame 
+Press 'q' to exit video
+'''
+
+#frame.shape = (594, 1280, 3)
+#frame in BGR
+
+# importing libraries
+import cv2
+import numpy as np
+   
+# Create a VideoCapture object and read from input file
+cap = cv2.VideoCapture(r'C:\Users\skand\Downloads\bolt_test_pothole.mp4') #REPLACE FILE ADDRESS HERE
+
+size = (594, 1280)
+
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+out = cv2.VideoWriter('output.mp4',fourcc, 15, size)
+
+def process(image):   
+    #Draws rectangle
+    cv2.rectangle(image, (100, 100), (200, 200), (255, 0, 0), 3)
+    
+   
+# Read until video is completed
+while(cap.isOpened()):
+      
+  # Capture frame-by-frame
+  ret, frame = cap.read()
+  if ret == True:
+
+    frame2 = frame.copy()
+    #Convert to GrayScale
+    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    #Binary Thresholding
+    ret, bimage = cv2.threshold(gray_frame, 100, 200, cv2.THRESH_BINARY)
+     
+    # Set our filtering parameters
+    # Initialize parameter setting using cv2.SimpleBlobDetector
+    params = cv2.SimpleBlobDetector_Params()
+     
+    # Set Area filtering parameters
+    params.filterByArea = True
+    params.minArea = 100
+     
+    # Set Circularity filtering parameters
+    params.filterByCircularity = True
+    params.minCircularity = 0.5
+     
+    # Set Convexity filtering parameters
+    params.filterByConvexity = True
+    params.minConvexity = 0.2
+         
+    # Set inertia filtering parameters
+    params.filterByInertia = False
+    #params.maxInertiaRatio = 0.8
+     
+    # Create a detector with the parameters
+    detector = cv2.SimpleBlobDetector_create(params)
+         
+    #Inverted Gray Frame
+    invgray_frame = 255 - gray_frame
+
+    
+    #Inverted Binary Frame
+    invbimage = 255 - bimage
+    
+    # Detect blobs
+    keypoints = detector.detect(invgray_frame)
+    print(keypoints)
+     
+    
+    # Draw blobs on our image as red circles
+    blank = np.zeros((1, 1))
+    output_image = cv2.drawKeypoints(frame2, keypoints, blank, (0, 255, 0),
+                              cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+ 
+
+    #Contour detection
+    #contours, hierarchy = cv2.findContours(image=bimage, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE) #Use CHAIN_APPROX_SIMPLE if u want
+
+    #Contour Drawing
+    #cv2.drawContours(image=frame2, contours=contours, contourIdx=-1, color=(0, 255, 0), thickness=2, lineType=cv2.LINE_AA)
+    
+    process(frame2)
+    #print(gray_frame.shape)
+    
+    #Storing in new video
+    out.write(output_image)
+    
+
+    # Display the resulting frame
+    cv2.imshow('Bolt', output_image)
+   
+    # Press Q on keyboard to  exit
+    if cv2.waitKey(25) & 0xFF == ord('q'):
+      break
+   
+  # Break the loop
+  else: 
+    break
+   
+# When everything done, release 
+# the video capture object
+cap.release()
+
+#Release Output   
+out.release()
+
+# Closes all the frames
+cv2.destroyAllWindows()
