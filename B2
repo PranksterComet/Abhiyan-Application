@@ -1,11 +1,13 @@
 '''
-NOTE: Currently not able to save the output video as a separate file so to see the output, replace the file address in videocapture with that in your computer
+NOTE:
+This code has been created only for bolt video
+Currently not able to save the output video as a separate file, so to see the output, replace the file address in videocapture with that in your computer
 Uses simpleblob detection to identify elliptical objects.
 Previously used contours, but unable to detect only the potholes using that approach
 Faults: 
-Identifying the cam-logo and white stripes of the cones which are unnecessary detections.
-Circles drawn around the potholes not large enough 
-Logo problem solvable by masking the logo with a rectangle around it in the input frame 
+Identifying white stripes of the cones which are unnecessary detections but practically bolt should avoid the cones anyways so it shouldn't be too much of an issue.
+Circles drawn around the potholes not large enough
+Possible Solution: Search for contours in a region of interest 1.5x the blob radius
 Press 'q' to exit video
 '''
 
@@ -17,7 +19,7 @@ import cv2
 import numpy as np
    
 # Create a VideoCapture object and read from input file
-cap = cv2.VideoCapture(r'C:\Users\skand\Downloads\bolt_test_pothole.mp4') #REPLACE FILE ADDRESS HERE
+cap = cv2.VideoCapture(r'C:\Users\skand\Downloads\bolt_test_pothole.mp4')
 
 size = (594, 1280)
 
@@ -72,6 +74,9 @@ while(cap.isOpened()):
     
     #Inverted Binary Frame
     invbimage = 255 - bimage
+
+    #Mask Logo
+    cv2.rectangle(invgray_frame, (1070, 525), (1260, 570), (0, 0, 0), -1)
     
     # Detect blobs
     keypoints = detector.detect(invgray_frame)
