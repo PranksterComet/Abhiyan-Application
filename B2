@@ -3,8 +3,9 @@ NOTE: Currently not able to save the output video as a separate file so to see t
 Uses simpleblob detection to identify elliptical objects.
 Previously used contours, but unable to detect only the potholes using that approach
 Faults: 
-Identifying the logo and white stripes of the cones which are unnecessary detections.
-Logo problem solvable by masking the logo by drawing a rectangle around it in the input frame 
+Identifying the cam-logo and white stripes of the cones which are unnecessary detections.
+Circles drawn around the potholes not large enough 
+Logo problem solvable by masking the logo with a rectangle around it in the input frame 
 Press 'q' to exit video
 '''
 
